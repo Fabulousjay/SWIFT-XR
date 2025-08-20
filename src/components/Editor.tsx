@@ -14,8 +14,7 @@ const Editor: React.FC = () => {
     const saved = localStorage.getItem('modelEditorState');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed.modelUrl && parsed.fileName)
-         {
+      if (parsed.modelUrl && parsed.fileName) {
         setState(parsed);
       }
     }
@@ -46,11 +45,11 @@ const Editor: React.FC = () => {
   };
 
   const addHotspot = (label: string) => {
-    if (!state.modelUrl) return;
+    if (!label.trim()) return;
     
     const newHotspot: Hotspot = {
       id: Date.now().toString(),
-      label,
+      label: label.trim(),
       position: new THREE.Vector3(0, 0, 0)
     };
     
@@ -99,6 +98,7 @@ const Editor: React.FC = () => {
           modelUrl={state.modelUrl} 
           hotspots={state.hotspots}
           onHotspotPositionChange={handleHotspotPositionChange}
+          isAddingHotspot={isAddingHotspot}
         />
       </div>
       <div className="controls-panel">

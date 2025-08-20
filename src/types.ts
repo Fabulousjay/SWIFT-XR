@@ -1,14 +1,13 @@
-import * as THREE from 'three';
+import * as THREE from 'three'
 
 export interface Hotspot {
-  id: string;
-  label: string;
-  position: THREE.Vector3;
-  screenPosition?: { x: number; y: number };
+  id: string
+  position: THREE.Vector3
+  label: string
 }
 
 export interface ModelEditorState {
-  modelUrl?: string;
-  fileName: string;
-  hotspots: Hotspot[];
+  modelUrl?: string
+  fileName: string
+  hotspots: Hotspot[]
 }

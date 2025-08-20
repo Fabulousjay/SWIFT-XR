@@ -3,23 +3,29 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import Rectangle from './Rectangle'
+import PlaceholderBox from './PlaceholderBox'
 import '../styles.css'
 
 interface Hotspot {
   id: string
   position: THREE.Vector3
+  label: string
 }
 
 interface ModelCanvasProps {
   modelUrl?: string
   hotspots?: Hotspot[]
   onHotspotPositionChange?: (id: string, position: THREE.Vector3) => void
+  isAddingHotspot?: boolean
 }
 
-const ModelCanvas: React.FC<ModelCanvasProps> = ({ modelUrl, hotspots = [], onHotspotPositionChange }) => {
+const ModelCanvas: React.FC<ModelCanvasProps> = ({ 
+  modelUrl, 
+  hotspots = [], 
+  onHotspotPositionChange,
+  isAddingHotspot = false 
+}) => {
   const groupRef = useRef<THREE.Group>(null)
-  const [labels, setLabels] = useState<{ position: THREE.Vector3; text: string }[]>([])
   const [sceneObject, setSceneObject] = useState<THREE.Group | null>(null)
 
   useEffect(() => {
@@ -48,73 +54,67 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({ modelUrl, hotspots = [], onHo
     )
   }, [modelUrl])
 
-  const addLabel = (position: THREE.Vector3) => {
-    const text = prompt('Enter label text:') || `Label ${labels.length + 1}`
-    setLabels([...labels, { position, text }])
+  const handleClick = (event: any) => {
+    if (!isAddingHotspot || !onHotspotPositionChange) return
+    
+    const latestHotspot = hotspots[hotspots.length - 1]
+    if (latestHotspot) {
+      onHotspotPositionChange(latestHotspot.id, event.point)
+    }
   }
 
- return (
-  <div className="model-viewer">
-    <Canvas camera={{ position: [5, 5, 5], fov: 75, near: 0.1, far: 1000 }}>
-      <ambientLight intensity={0.6} />
-      <directionalLight intensity={0.8} position={[2, 2, 2]} />
+  return (
+    <div className="model-viewer">
+      <Canvas camera={{ position: [10, 10, 10], fov: 45, near: 0.1, far: 1000 }}>
+        <ambientLight intensity={0.6} />
+        <directionalLight intensity={0.8} position={[5, 5, 5]} />
+        <pointLight position={[-5, -5, -5]} intensity={0.5} />
 
-      <group ref={groupRef}>
-        {!modelUrl ? (
-          <>
-            <Rectangle position={[0, -1, 0]} rotation={[Math.PI / 2, 0, 0]} />
-            <Rectangle position={[0, 1, 0]} rotation={[-Math.PI / 2, 0, 0]} />
-            <Rectangle position={[-1, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
-            <Rectangle position={[1, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
-            <Rectangle position={[0, 0, -1]} rotation={[0, 0, 0]} />
-            <Rectangle position={[0, 0, 1]} rotation={[0, Math.PI, 0]} />
+        <group ref={groupRef} onClick={handleClick}>
+          {!modelUrl ? (
+            <PlaceholderBox />
+          ) : (
+            sceneObject && <primitive object={sceneObject} />
+          )}
 
-            {[[-1, 0, 0], [1, 0, 0], [0, 0, -1], [0, 0, 1]].map((pos, i) => (
-              <mesh key={i} position={pos as [number, number, number]}>
-                <boxGeometry args={[0.2, 0.2, 0.2]} />
-                <meshStandardMaterial color="yellow" />
+          {hotspots.map((hotspot) => (
+            <group key={hotspot.id} position={[hotspot.position.x, hotspot.position.y, hotspot.position.z]}>
+              <mesh>
+                <sphereGeometry args={[0.2, 16, 16]} />
+                <meshBasicMaterial color="#e74c3c" />
               </mesh>
-            ))}
-          </>
-        ) : (
-          sceneObject && <primitive object={sceneObject} />
-        )}
+              <Html position={[0, 0.5, 0]} distanceFactor={15}>
+                <div className="hotspot-label-display">
+                  {hotspot.label}
+                </div>
+              </Html>
+            </group>
+          ))}
 
-        {hotspots.map((hotspot) => (
           <mesh
-            key={hotspot.id}
-            position={hotspot.position}
-            onClick={(e) => onHotspotPositionChange?.(hotspot.id, e.point)}
-          >
-            <sphereGeometry args={[0.1, 32, 32]} />
-            <meshBasicMaterial color="red" />
-          </mesh>
-        ))}
+            visible={false}
+            geometry={new THREE.BoxGeometry(20, 20, 20)}
+            material={new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })}
+          />
+        </group>
 
-        {labels.map((label, index) => (
-          <mesh key={index} position={label.position}>
-            <sphereGeometry args={[0.1, 32, 32]} />
-            <meshBasicMaterial color="red" />
-            <Html position={[0, 0.2, 0]}>
-              <div style={{ backgroundColor: 'black', color: 'white', padding: '0.25rem', borderRadius: '0.25rem', fontSize: '0.875rem' }}>
-                {label.text}
-              </div>
-            </Html>
-          </mesh>
-        ))}
-
-        <mesh
-          onClick={(e) => addLabel(e.point)}
-          geometry={new THREE.BoxGeometry(10, 10, 10)}
-          material={new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })}
+        <OrbitControls 
+          enableDamping 
+          dampingFactor={0.05}
+          enablePan 
+          enableRotate 
+          minDistance={2}
+          maxDistance={50}
         />
-      </group>
-
-      <OrbitControls enableDamping enablePan enableRotate />
-    </Canvas>
-  </div>
-)
-
+      </Canvas>
+      
+      {isAddingHotspot && (
+        <div className="hotspot-placement-notification">
+          Click on the model to place hotspot
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default ModelCanvas

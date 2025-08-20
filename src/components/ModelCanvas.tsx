@@ -1,4 +1,3 @@
-// src/components/ModelCanvas.tsx
 import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Html } from '@react-three/drei'

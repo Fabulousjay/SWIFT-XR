@@ -1,4 +1,3 @@
-/* src/styles.css */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -130,7 +129,7 @@ body {
 }
 
 .jare-button {
-  padding: 10px 20px;
+  padding: 10px 0;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -186,4 +185,64 @@ body {
   font-size: 14px;
   font-weight: 500;
   z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .model-editor {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .viewer-panel {
+    flex: none;
+    height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .controls-panel {
+    flex: none;
+    min-width: auto;
+    padding: 16px;
+  }
+  
+  .import-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .jare-button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .hotspot-input-group {
+    flex-direction: column;
+  }
+  
+  .hotspot-item {
+    padding: 10px;
+  }
+  
+  .hotspot-label {
+    font-size: 13px;
+    margin-left: 10px;
+  }
+  
+  .hotspot-manager {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+  
+  .import-section {
+    margin-top: 24px;
+  }
 }

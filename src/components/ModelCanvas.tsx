@@ -1,3 +1,4 @@
+// src/components/ModelCanvas.tsx
 import React, { useRef, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Html } from '@react-three/drei'
@@ -44,7 +45,7 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
 
         const size = box.getSize(new THREE.Vector3())
         const maxDim = Math.max(size.x, size.y, size.z)
-        const scale = 4.0 / maxDim
+        const scale = 2.0 / maxDim
         model.scale.set(scale, scale, scale)
 
         setSceneObject(model)
@@ -65,10 +66,9 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
 
   return (
     <div className="model-viewer">
-      <Canvas camera={{ position: [10, 10, 10], fov: 45, near: 0.1, far: 1000 }}>
+      <Canvas camera={{ position: [3, 3, 3], fov: 50, near: 0.1, far: 1000 }}>
         <ambientLight intensity={0.6} />
-        <directionalLight intensity={0.8} position={[5, 5, 5]} />
-        <pointLight position={[-5, -5, -5]} intensity={0.5} />
+        <directionalLight intensity={0.8} position={[2, 2, 2]} />
 
         <group ref={groupRef} onClick={handleClick}>
           {!modelUrl ? (
@@ -80,10 +80,10 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
           {hotspots.map((hotspot) => (
             <group key={hotspot.id} position={[hotspot.position.x, hotspot.position.y, hotspot.position.z]}>
               <mesh>
-                <sphereGeometry args={[0.2, 16, 16]} />
-                <meshBasicMaterial color="#e74c3c" />
+                <sphereGeometry args={[0.1, 16, 16]} />
+                <meshBasicMaterial color="#3498db" />
               </mesh>
-              <Html position={[0, 0.5, 0]} distanceFactor={15}>
+              <Html position={[0, 0.2, 0]} distanceFactor={8}>
                 <div className="hotspot-label-display">
                   {hotspot.label}
                 </div>
@@ -92,20 +92,12 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
           ))}
 
           <mesh
-            visible={false}
-            geometry={new THREE.BoxGeometry(20, 20, 20)}
+            geometry={new THREE.BoxGeometry(10, 10, 10)}
             material={new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })}
           />
         </group>
 
-        <OrbitControls 
-          enableDamping 
-          dampingFactor={0.05}
-          enablePan 
-          enableRotate 
-          minDistance={2}
-          maxDistance={50}
-        />
+        <OrbitControls enableDamping enablePan enableRotate />
       </Canvas>
       
       {isAddingHotspot && (
